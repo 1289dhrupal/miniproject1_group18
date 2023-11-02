@@ -1,0 +1,133 @@
+[
+{
+        "user_id" : "user1",
+        "password" : "1a2b3c",
+        "date_of_join" : "16/10/2010",
+        "education" : "M.C.A.",
+        "profession" : "CONSULTANT",
+        "interest" : "MUSIC",
+        "community_name" : [
+                "MODERN MUSIC",
+                "CLASSICAL MUSIC",
+                "WESTERN MUSIC"
+        ],
+        "community_moder_id" : [
+                "MR. Alex",
+                "MR. Dang",
+                "MR Haris"
+        ],
+        "community_members" : [
+                700,
+                200,
+                1500
+        ],
+        "friends_id" : [
+                "kumar",
+                "harry",
+                "anand"
+        ],
+        "ban_friends_id" : [
+                "Amir",
+                "Raja",
+                "mont"
+        ]
+},
+{
+        "user_id" : "user2",
+        "password" : "11aa1a",
+        "date_of_join" : "17/10/2009",
+        "education" : "M.B.A.",
+        "profession" : "MARKETING",
+        "interest" : "MUSIC",
+        "community_name" : [
+                "MODERN MUSIC",
+                "CLASSICAL MUSIC",
+                "WESTERN MUSIC"
+        ],
+        "community_moder_id" : [
+                "MR. Roy",
+                "MR. Das",
+                "MR Doglus"
+        ],
+        "community_members" : [
+                500,
+                300,
+                1400
+        ],
+        "friends_id" : [
+                "pal",
+                "viki",
+                "john"
+        ],
+        "ban_friends_id" : [
+                "jalan",
+                "monoj",
+                "evan"
+        ]
+},
+{
+        "user_id" : "user3",
+        "password" : "b1c1d1",
+        "date_of_join" : "16/10/2010",
+        "education" : "M.C.A.",
+        "profession" : "IT COR.",
+        "interest" : "ART",
+        "community_name" : [
+                "MODERN ART",
+                "CLASSICAL ART",
+                "WESTERN ART"
+        ],
+        "community_moder_id" : [
+                "MR. Rifel",
+                "MR. Sarma",
+                "MR Bhatia"
+        ],
+        "community_members" : [
+                5000,
+                2000,
+                1500
+        ],
+        "friends_id" : [
+                "philip",
+                "anant",
+                "alan"
+        ],
+        "ban_friends_id" : [
+                "Amir",
+                "Raja",
+                "mont"
+        ]
+},
+{
+        "user_id" : "user4",
+        "password" : "abczyx",
+        "date_of_join" : "17/8/2009",
+        "education" : "M.B.B.S.",
+        "profession" : "DOCTOR",
+        "interest" : "SPORTS",
+        "community_name" : [
+                "ATHELATIC",
+                "GAMES FAN GYES",
+                "FAVOURIT GAMES"
+        ],
+        "community_moder_id" : [
+                "MR. Paul",
+                "MR. Das",
+                "MR Doglus"
+        ],
+        "community_members" : [
+                2500,
+                2200,
+                3500
+        ],
+        "friends_id" : [
+                "vinod",
+                "viki",
+                "john"
+        ],
+        "ban_friends_id" : [
+                "jalan",
+                "monoj",
+                "evan"
+        ]
+}]
