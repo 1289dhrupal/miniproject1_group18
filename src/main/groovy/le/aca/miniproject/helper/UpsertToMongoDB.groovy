@@ -2,19 +2,12 @@ package le.aca.miniproject.helper
 
 import org.bson.Document
 
-import com.mongodb.BasicDBList
-import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoClients
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
-
-// load credentials from src/main/resources/mongodb.properties
-// this file should contain
-//		USN=yourUsername
-//		PWD=yourPassword
-//		DB=yourDatabaseName
+System.exit(0)
 
 def properties = new Properties()
 def propertiesFile = new File('src/main/resources/mongodb.properties')
@@ -33,35 +26,40 @@ def db = mongoClient.getDatabase(properties.DB)
 println 'database: ' + db.getName()
 db.listCollectionNames().each{ println it }
 
-def filter = { key, val ->
-	def filterAux = new BasicDBObject()
-	filterAux.append(key, val)
-	filterAux
-}
-
-def set = { key, val ->
-	def updateObject = new BasicDBObject()
-	updateObject.append('$set', new BasicDBObject().append(key,val))
-	updateObject
-}
-
 def collection = db.getCollection("taxi-data")
+collection.drop()
 
 println "==========================================================================================="
 
 // parse JSON file
-def jsonFile = new File('src/main/resources/fhvhv_tripdata_2023-01.json')
+def jsonFile = new File('src/main/resources/parsed_input.json')
 def jsonSlurper = new JsonSlurper()
 def list = jsonSlurper.parseText(jsonFile.text)
 
-for (obj in list) {
-	def doc = Document.parse(JsonOutput.toJson(obj))
-	collection.insertOne(doc)
-}
-
 println "==========================================================================================="
 
-println collection .countDocuments()
+def documentsBatch = []
+def batchSize = 10000
+
+for (obj in list) {
+	def doc = Document.parse(JsonOutput.toJson(obj))
+	documentsBatch.add(doc)
+
+	// When the batch size is reached, insert the batch and clear the list
+	if (documentsBatch.size() == batchSize) {
+		collection.insertMany(documentsBatch)
+		println "Inserted : ${documentsBatch.size()}"
+		documentsBatch = []
+	}
+}
+
+if (documentsBatch.size() > 0) {
+	collection.insertMany(documentsBatch)
+	println "Inserted : ${documentsBatch.size()}"
+	documentsBatch = []
+}
+
+println "Total Documents Inserted : ${collection.countDocuments()}"
 
 println "==========================================================================================="
 

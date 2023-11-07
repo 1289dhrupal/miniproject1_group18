@@ -1,3 +1,23 @@
+# fields we will be using
+pickup_datetime | tpep_pickup_datetime
+pickup_datetime | tpep_dropoff_datetime
+PULocationID 
+DOLocationID 
+-- Passenger_count 
+trip_miles | Trip_distance 
+tips | Tip_amount
+-- Total_amount  
+-- Payment_type 
+-- VendorID
+base_passenger_fare | Fare_amount 
+
+https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_green.pdf
+https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_hvfhs.pdf
+
+
+
+
 # Mini project 1 sample
 
 This project is based on the project template of the worksheet for week 13 and it provides a couple of examples of acceptable queries for the mini project using the IMDB movie dataset used in the programming exercises:
