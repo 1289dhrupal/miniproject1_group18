@@ -4,11 +4,13 @@ import static com.mongodb.client.model.Accumulators.*
 import static com.mongodb.client.model.Aggregates.*
 import static com.mongodb.client.model.Filters.*
 import static com.mongodb.client.model.Projections.*
+import static com.mongodb.client.model.Sorts.*
 
 import org.bson.Document
 
-import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoClients
+
+import groovy.json.JsonOutput
 
 def properties = new Properties()
 def propertiesFile = new File('src/main/resources/mongodb.properties')
@@ -18,7 +20,7 @@ propertiesFile.withInputStream {
 }
 
 // MAKING THE CONNECTION
-def mongoClient = MongoClients.create("mongodb+srv://${properties.USN}:${properties.PWD}@${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority")
+def mongoClient = MongoClients.create("mongodb+srv://${properties.USN}:${properties.PWD}@${properties.CLUSTER}.${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority")
 
 // GET DATABASE
 def db = mongoClient.getDatabase(properties.DB)
@@ -27,7 +29,7 @@ def db = mongoClient.getDatabase(properties.DB)
 println 'database: ' + db.getName()
 db.listCollectionNames().each { println it }
 
-def collection = db.getCollection("tripdata_fhvhv")
+def collection = db.getCollection("tripdata_fhvhv-2023-01-02")
 
 def replace = {
     a,b -> 
@@ -46,10 +48,12 @@ def pipeline = [
     ),
     group(
         new Document("\$concat", Arrays.asList("\$hvfhs_license_num", "#", "\$dispatching_base_num")),
+        sum("trips_count", 1),
         avg("avg_trip_miles", "\$trip_miles"),
         avg("avg_trip_time", "\$trip_time"),
         sum("total_base_fare", "\$base_passenger_fare"),
         avg("avg_tips", "\$tips"),
+		avg("avg_driver_pay", "\$driver_pay"),
     ),
     project(
         fields(
@@ -62,15 +66,14 @@ def pipeline = [
                     replace("HV0005", "Lyft"),
                 )).append("default", "\$_id")),
             ),
-            include("avg_trip_miles", "avg_trip_time", "total_base_fare", "avg_tips"),
+            include("trips_count", "avg_trip_miles", "avg_trip_time", "total_base_fare", "avg_tips", "avg_driver_pay"),
         )
-    )
+    ),
+    sort(descending("trips_count")) // Sorting stage added here
 ]
-def resultList = collection.aggregate(pipeline).into(new ArrayList < > ())
 
-resultList.each {
-    println(it)
-}
+def selectedTrips = collection.aggregate(pipeline).into(new ArrayList < > ())
+println(JsonOutput.prettyPrint(JsonOutput.toJson(selectedTrips)))
 
 // Close the MongoDB connection
 mongoClient.close()
