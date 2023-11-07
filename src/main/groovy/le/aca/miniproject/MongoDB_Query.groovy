@@ -27,7 +27,7 @@ def db = mongoClient.getDatabase(properties.DB)
 println 'database: ' + db.getName()
 db.listCollectionNames().each { println it }
 
-def collection = db.getCollection("taxi-data")
+def collection = db.getCollection("tripdata_fhvhv")
 
 def replace = {
     a,b -> 

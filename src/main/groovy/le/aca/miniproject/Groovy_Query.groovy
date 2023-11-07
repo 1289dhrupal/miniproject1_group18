@@ -6,7 +6,7 @@ import groovy.json.JsonSlurper
 // from JSON file to Groovy map
 def jsonSlurper = new JsonSlurper()
 
-def file = new File('src/main/resources/parsed_input.json')
+def file = new File('src/main/resources/parsed_input-fhvhv-2023-01-01.json')
 def tripList = jsonSlurper.parseText(file.text)
 
 
