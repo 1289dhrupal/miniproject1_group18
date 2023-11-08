@@ -58,8 +58,8 @@ To allocate more heap memory in Eclipse:
 -Xms512m
 -Xmx2048m
 ```
-Here, `-Xms512m` sets the initial heap size, and `-Xmx2048m` sets the maximum heap size. Adjust the numbers to suit your data size and system capabilities.<br>
-Make sure to apply the changes and close the Run Configurations window before executing your script.
+Here, `-Xms512m` sets the initial heap size, and `-Xmx2048m` sets the maximum heap size. Adjust the numbers to suit your data size and system capabilities. Make sure to apply the changes and close the Run Configurations window before executing your script.<br>
+If this does not work out please follow [Eclipse OutOfMemory Error Fix ](https://www.digitalocean.com/community/tutorials/eclipse-out-of-memory-error-increasing-heap-memory-permgen-space)
 
 ## Acknowledgments
 New York City Taxi and Limousine Commission for providing the dataset.<br>
