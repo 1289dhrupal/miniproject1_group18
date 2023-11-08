@@ -12,70 +12,70 @@ import groovy.json.JsonSlurper
 
 public class JsonHelper {
 
-	public static saveParquetFromURL (parquetFileUrl, parquetFilePath) {
-		BufferedInputStream ip
-		FileOutputStream fos
+	public static saveParquetFromURL (pParquetFileUrl, pParquetFilePath) {
+		BufferedInputStream lBufferedIS
+		FileOutputStream lFileOS
 
 		try  {
-			ip = new BufferedInputStream(new URL(parquetFileUrl).openStream())
-			fos = new FileOutputStream(parquetFilePath)
+			lBufferedIS = new BufferedInputStream(new URL(pParquetFileUrl).openStream())
+			lFileOS = new FileOutputStream(pParquetFilePath)
 
-			byte[] dataBuffer = new byte[1024]
-			int bytesRead
+			byte[] larrDataBuffer = new byte[1024]
+			int liBytesRead
 
-			while ((bytesRead = ip.read(dataBuffer, 0, 1024)) != -1) {
-				fos.write(dataBuffer, 0, bytesRead);
+			while ((liBytesRead = lBufferedIS.read(larrDataBuffer, 0, 1024)) != -1) {
+				lFileOS.write(larrDataBuffer, 0, liBytesRead);
 			}
-		} catch (IOException e) {
-			System.out.println("Failed to store Parquet file.")
+		} catch (IOException lException) {
+			System.out.println("Failed to store Parquet file." + lException.getMessage())
 			System.exit(0)
 		} finally {
-			ip.close();
-			fos.close();
+			lBufferedIS.close();
+			lFileOS.close();
 		}
 	}
 
-	public static int saveParquetToJson(String parquetFilePath, String jsonFilePath, Closure<Boolean> skipRecord, Closure<Map<String, Object>> projectRecordToJson) {
-		Path parquetPath = new Path(parquetFilePath)
-		FileWriter fileWriter
+	public static int saveParquetToJson(String pParquetFilePath, String pJsonFilePath, Closure<Boolean> pSkipRecordClosure, Closure<Map<String, Object>> pProjectRecordClosure) {
+		Path lParquetPath = new Path(pParquetFilePath)
+		FileWriter lFileWriter
 		try {
-			HadoopInputFile parquetFile = HadoopInputFile.fromPath(parquetPath , new Configuration());
-			ParquetReader < GenericRecord > reader = AvroParquetReader.builder(parquetFile).build()
+			HadoopInputFile lparquetFile = HadoopInputFile.fromPath(lParquetPath , new Configuration());
+			ParquetReader < GenericRecord > lReader = AvroParquetReader.builder(lparquetFile).build()
 
-			fileWriter = new FileWriter(jsonFilePath)
-			int counter = 0
-			String sep = ""
+			lFileWriter = new FileWriter(pJsonFilePath)
+			int liCounter = 0
+			String lstrSep = ""
 
-			GenericRecord record
-			fileWriter.write("[")
-			while ((record = reader.read()) != null) {
+			GenericRecord lRecord
+			lFileWriter.write("[")
+			while ((lRecord = lReader.read()) != null) {
 
-				if(skipRecord(record)) {
+				if(pSkipRecordClosure(lRecord)) {
 					continue
 				}
 
-				String jsonRecord = JsonOutput.toJson(projectRecordToJson(record))
-				fileWriter.write("${sep}${jsonRecord}")
-				sep = ","
+				String lstrJsonRecord = JsonOutput.toJson(pProjectRecordClosure(lRecord))
+				lFileWriter.write("${lstrSep}${lstrJsonRecord}")
+				lstrSep = ","
 
-				counter++;
+				liCounter++;
 			}
 
-			fileWriter.write("]")
-			fileWriter.flush()
+			lFileWriter.write("]")
+			lFileWriter.flush()
 
-			return counter;
-		} catch (IOException e) {
-			System.out.println("Failed to store Json file.")
+			return liCounter;
+		} catch (IOException lException) {
+			System.out.println("Failed to store Parquet file." + lException.getMessage())
 			System.exit(0)
 		} finally {
-			fileWriter.close()
+			lFileWriter.close()
 		}
 	}
 
-	public static List<Object> loadJson(String jsonFilePath) {
-		File jsonFile = new File(jsonFilePath)
-		JsonSlurper jsonSlurper = new JsonSlurper()
-		return jsonSlurper.parseText(jsonFile.text)
+	public static List<Object> loadJson(String pJsonFilePath) {
+		File lJsonFile = new File(pJsonFilePath)
+		JsonSlurper lJsonSlurper = new JsonSlurper()
+		return lJsonSlurper.parseText(lJsonFile.text)
 	}
 }

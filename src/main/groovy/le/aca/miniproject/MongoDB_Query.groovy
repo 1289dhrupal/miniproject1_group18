@@ -8,33 +8,33 @@ import static com.mongodb.client.model.Sorts.*
 
 import org.bson.Document
 
-import com.mongodb.client.MongoClients
-
 import groovy.json.JsonOutput
+import le.aca.miniproject.helpers.MongoDBHelper
 
+// Read Properties From File
 def properties = new Properties()
-def propertiesFile = new File('src/main/resources/mongodb.properties')
+def propertiesFile = new File("src/main/resources/application.properties")
+propertiesFile.withInputStream { properties.load(it) }
 
-propertiesFile.withInputStream {
-    properties.load(it)
-}
+// Extract Required Properties
+def collectionName = "tripdata_fhvhv-${properties.data_year_month}-${properties.data_day}"
 
-// MAKING THE CONNECTION
-def mongoClient = MongoClients.create("mongodb+srv://${properties.USN}:${properties.PWD}@${properties.CLUSTER}.${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority")
+/**
+ * match trips with trip_miles, trip_time greater than 0 and base_passenger greater than equal to 0.
+ * group by hvfhs_license_num#dispatching_base_num and aggreagate required fields
+ * Replace the id as company_name#dispatching_base_num 
+ * Sort in desc of total trips
+ */
 
-// GET DATABASE
-def db = mongoClient.getDatabase(properties.DB)
+// Initialize the MongoDB client
+def mdb = new MongoDBHelper(properties)
 
-// TESTING CONNECTION
-println 'database: ' + db.getName()
-db.listCollectionNames().each { println it }
+// Get the Collection
+def collection = mdb.getCollection(collectionName)
 
-def collection = db.getCollection("tripdata_fhvhv-2023-01-02")
-
-def replace = {
-    a,b -> 
-	new Document("case", new Document("\$regexMatch", new Document("input", "\$_id").append("regex", a)))
-	.append("then", new Document("\$replaceAll", new Document("input", "\$_id").append("find", a).append("replacement", b)))
+def replace = { a, b ->
+    new Document("case", new Document("\$regexMatch", new Document("input", "\$_id").append("regex", a)))
+		.append("then", new Document("\$replaceAll", new Document("input", "\$_id").append("find", a).append("replacement", b)))
 }
 
 // Aggregation pipeline
@@ -53,7 +53,7 @@ def pipeline = [
         avg("avg_trip_time", "\$trip_time"),
         sum("total_base_fare", "\$base_passenger_fare"),
         avg("avg_tips", "\$tips"),
-		avg("avg_driver_pay", "\$driver_pay"),
+        avg("avg_driver_pay", "\$driver_pay"),
     ),
     project(
         fields(
@@ -69,11 +69,11 @@ def pipeline = [
             include("trips_count", "avg_trip_miles", "avg_trip_time", "total_base_fare", "avg_tips", "avg_driver_pay"),
         )
     ),
-    sort(descending("trips_count")) // Sorting stage added here
+    sort(descending("trips_count"))
 ]
 
 def selectedTrips = collection.aggregate(pipeline).into(new ArrayList < > ())
 println(JsonOutput.prettyPrint(JsonOutput.toJson(selectedTrips)))
 
 // Close the MongoDB connection
-mongoClient.close()
+mdb.close()

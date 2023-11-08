@@ -2,12 +2,7 @@ package le.aca.miniproject;
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-
-// from JSON file to Groovy map
-def jsonSlurper = new JsonSlurper()
-
-def file = new File('src/main/resources/tripdata_fhvhv-2023-01-02.json')
-def tripList = jsonSlurper.parseText(file.text)
+import le.aca.miniproject.helpers.JsonHelper
 
 
 /**
@@ -18,6 +13,17 @@ def tripList = jsonSlurper.parseText(file.text)
  * Aggreagate rest of the fields
  * Sort in desc of total trips
  */
+
+// Read Properties From File
+def properties = new Properties()
+def propertiesFile = new File("src/main/resources/application.properties")
+propertiesFile.withInputStream { properties.load(it) }
+
+// Extract Required Properties
+def fileName = "tripdata_fhvhv-${properties.data_year_month}-${properties.data_day}"
+
+// From JSON file to Groovy map
+def tripList = JsonHelper.loadJson("src/main/resources/${fileName}.json")
 
 def licenseToServiceMap = [
 	'HV0002': 'Juno',

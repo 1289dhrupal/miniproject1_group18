@@ -8,16 +8,14 @@ import groovy.transform.Field
 import le.aca.miniproject.helpers.JsonHelper
 import le.aca.miniproject.helpers.MongoDBHelper
 
-@Field final BASE_DIR_PATH = "src/main/resources/%s"
-@Field final BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/%s_tripdata_%s.parquet"
+@Field static final BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/fhvhv_tripdata_%s.parquet"
 
-def convertParquetToJson(String tripType, String fileName, String YearMonth, String Day) {
+public static String saveTripData(Properties pProperties) {
+	String lstrparquetFileUrl = String.format(BASE_URL, pProperties.data_year_month)
+	String lstrparquetFilePath = "src/main/resources/tripdata_fhvhv-${pProperties.data_year_month}.parquet"
+	String lstrJsonFilePath = "src/main/resources/tripdata_fhvhv-${pProperties.data_year_month}-${pProperties.data_day}.json"
 
-	String parquetFileUrl = String.format(BASE_URL, tripType, YearMonth)
-	String parquetFilePath = String.format(BASE_DIR_PATH, "tripdata_${tripType}-${YearMonth}.parquet")
-	String jsonFilePath = String.format(BASE_DIR_PATH, "${fileName}.json")
-
-	Closure<Map<String, Object>> projectRecordToJson = { GenericRecord record ->
+	Closure<Map<String, Object>> lmapProjectRecordToJson = { GenericRecord record ->
 		return [
 			hvfhs_license_num: record.get("hvfhs_license_num"),
 			dispatching_base_num: record.get("dispatching_base_num"),
@@ -31,38 +29,36 @@ def convertParquetToJson(String tripType, String fileName, String YearMonth, Str
 		]
 	}
 
-	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-	dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+	SimpleDateFormat lDateFormat = new SimpleDateFormat("yyyy-MM-dd")
+	lDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
 
-	long epochStart = dateFormat.parse("${YearMonth}-${Day}").time
-	long epochEnd = (60 * 60 * 24 * 1000) + epochStart
+	long llStart = lDateFormat.parse("${pProperties.data_year_month}-${pProperties.data_day}").time
+	long llEnd = (60 * 60 * 24 * 1000) + llStart
 
-	Closure<Boolean> skipRecord = { GenericRecord record ->
-		long request_datetime = record.get("request_datetime")/1000;
-		request_datetime < epochStart || request_datetime >= epochEnd
+	Closure<Boolean> lskipRecordClosure = { GenericRecord record ->
+		long llRequestDatetime = record.get("request_datetime")/1000;
+		llRequestDatetime < llStart || llRequestDatetime >= llEnd
 	}
 
-	if (!new File(jsonFilePath).exists()) {
-		if(!new File(parquetFilePath).exists()) {
-			JsonHelper.saveParquetFromURL(parquetFileUrl, parquetFilePath)
+	if (!new File(lstrJsonFilePath).exists()) {
+		if(!new File(lstrparquetFilePath).exists()) {
+			JsonHelper.saveParquetFromURL(lstrparquetFileUrl, lstrparquetFilePath)
 		}
 
-		int savedObjects = JsonHelper.saveParquetToJson(parquetFilePath, jsonFilePath, skipRecord, projectRecordToJson)
-		assert savedObjects != 0
+		int liSavedObjects = JsonHelper.saveParquetToJson(lstrparquetFilePath, lstrJsonFilePath, lskipRecordClosure, lmapProjectRecordToJson)
+		assert liSavedObjects != 0
 	}
 
-	return jsonFilePath
+	return lstrJsonFilePath
 }
 
-def upsertJsonToMongoDB(String propertiesFile, String jsonFile, String collectionName) {
-	String propertiesFilePath = String.format(BASE_DIR_PATH, propertiesFile)
-
-	MongoDBHelper mdb = new MongoDBHelper(propertiesFilePath)
-	if(mdb.getCollection(collectionName).countDocuments() == 0) {
-		mdb.upsertFile(jsonFile, collectionName)
+public static void upsertMongoDB(String pJsonFilePath, Properties pProperties) {
+	String lstrCollectionName = "tripdata_fhvhv-${pProperties.data_year_month}-${pProperties.data_day}"
+	MongoDBHelper lMongodbHelper = new MongoDBHelper(pProperties)
+	if(lMongodbHelper.getCollection(lstrCollectionName).countDocuments() == 0) {
+		lMongodbHelper.upsertFile(pJsonFilePath, lstrCollectionName)
 	}
-
-	mdb.close()
+	lMongodbHelper.close()
 }
 
 // As of now we are only using fhvhv trip data for the month of Jan 2023
@@ -70,11 +66,11 @@ def upsertJsonToMongoDB(String propertiesFile, String jsonFile, String collectio
 // This is done due to the storage and computing restrictions
 // Parsed 629_770 objects and saved at location: src/main/resources/parsed_input-fhvhv-2023-01-01.json
 
-String tripType = "fhvhv"
-String yearMonth = "2023-01"
-String day = "02"
-String dataName = "tripdata_${tripType}-${yearMonth}-${day}"
+// Read Properties From File
+Properties lProperties = new Properties()
+File lPropertiesFile = new File("src/main/resources/application.properties")
+lPropertiesFile.withInputStream { lProperties.load(it) }
 
-String jsonFilePath = convertParquetToJson(tripType, dataName, yearMonth, day)
-upsertJsonToMongoDB("mongodb.properties", jsonFilePath, dataName)
-
+// Fetch Parquet File From the CDN and save to Json File and MongoDB
+String lstrJsonFilePath = saveTripData(lProperties)
+upsertMongoDB(lstrJsonFilePath, lProperties)
