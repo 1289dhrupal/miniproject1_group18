@@ -1,89 +1,51 @@
-# fields we will be using
-pickup_datetime | tpep_pickup_datetime
-pickup_datetime | tpep_dropoff_datetime
-PULocationID 
-DOLocationID 
--- Passenger_count 
-trip_miles | Trip_distance 
-tips | Tip_amount
--- Total_amount  
--- Payment_type 
--- VendorID
-base_passenger_fare | Fare_amount 
+# NYC Taxi Data Analysis Project
 
-https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
-https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_green.pdf
-https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_hvfhs.pdf
+This project is designed to analyze New York City taxi data using Groovy scripts within a Gradle project environment. It contains scripts to set up the necessary datasets and perform complex queries to gain insights from the data.
 
+## Prerequisites
 
+Before you begin, ensure you have the following installed:
+- Eclipse DSL IDE
+- Groovy/Grails Tool Suite
+- Java Development Kit (JDK)
 
+## Installation
 
-# Mini project 1 sample
+Follow these steps to get the project up and running:
 
-This project is based on the project template of the worksheet for week 13 and it provides a couple of examples of acceptable queries for the mini project using the IMDB movie dataset used in the programming exercises:
+#### Step 1: Import the Project
+Open Eclipse and import the Gradle project. Navigate to `File > Import > Gradle > Existing Gradle Project` and select the project directory.
 
-## Query 1
+#### Step 2: Configure Application Properties
+Fill up the `application.properties` file located in the resource folder with the necessary configuration settings.
 
-This is a simple query, aiming to a satisfactory mark.
+#### Step 3: Initialize the Dataset
+Run `SetupData.groovy` as a Groovy script to set up the initial dataset required for analysis.
 
-  * Query: Select movies with more than a 9 rating and project title and year. Then the resulting movies are sorted by year, in ascending order. 
-  * Groovy implementation: `src/main/groovy/Query_Groovy_simple.groovy`
-  * MongoDB implementation: `src/main/groovy/Query_MongoDB_simple.groovy`
+#### Step 4: Run Analysis Scripts
+Execute either `Groovy_Query.groovy` or `MongoDB_Query.groovy` as Groovy scripts to perform data analysis.
 
-## Query 2
+## Scripts Overview
+* `Groovy_Query.groovy`: Performs data analysis by executing complex queries directly on the dataset using Groovy's capabilities.
+* `MongoDB_Query.groovy`: Leverages MongoDB's powerful querying capabilities to analyze the data and provide insights.
+* `SetupData.groovy`: Prepares the dataset necessary for running the analysis scripts.
+* `JsonHelper.groovy` and `MongoDBHelper.groovy`: Serve as helper classes to facilitate operations on JSON data and interaction with MongoDB, respectively.
 
-This is a more compelling query exercising more features of both Groovy and MongoDB and it should therefore lead to a better mark.
+## Data Description
+The NYC taxi data being analyzed includes the following fields:
+* `trip_miles`: The total miles of the trip.
+* `trip_time`: The duration of the trip.
+* `base_passenger_fare`: The basic fare paid by the passenger.
+* `tips`: Tips given to the driver.
+* `driver_pay`: The amount paid to the driver.
+* `hvfhs_license_num`: The license number of the High Volume For-Hire Service.
+* `dispatching_base_num`: The base number from which the vehicle is dispatched.
 
-  * Query: Select actors that star more than 1 movie with at least a 9 imdb rating.
-  * Groovy implementation: `src/main/groovy/Query_Groovy_compelling.groovy`
-  * MongoDB implementation: `src/main/groovy/Query_Groovy_compelling.groovy`
+For an in-depth understanding of the dataset, refer to the [NYC Taxi Data Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_hvfhs.pdf)<br>
+The dataset can be obtained from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 
+## Acknowledgments
+New York City Taxi and Limousine Commission for providing the dataset.<br>
+Contributors and maintainers of this project.
 
-## Ideas for the analysis in exercise 4
-
-In addition to the rubric you may want to use some of the questions below to discuss exercise 4. This is just a sample of questions, which is not supposed to be prescriptive. Feel free to choose and expand according to your interests.
-
-### Evolution
-
-* Which implementation is more understandable? Why?
-* Which implementation is likely to be more maintainable? Why?
-* When importing movies from other datasets:
-  * What is the impact of a change of data structure in the query evaluation?
-  * Would you need to develop a new database? Would you need to migrate data to the new version? Why? How?
-  * Are there any implications regarding forward/backward compatibility?
-
-### Scalability
-
-* Which implementation is faster? Have you measured it? How?
-* Which implementation can be scaled? How? 
-* Which implementation cannot be scaled? Why not?
-
-Here the point is to do some research on the support that MongoDb offers for managing clusters.
-
-### Consistency
-
-* If you have different applications modifying the same dataset (stored as a JSON file or in the MongoDB database), how would you ensure that there are no write-write conflicts? Here the point is to discuss how concurrency can be handled in Groovy and in MongoDB.
-* If the dataset is replicated, how would you ensure that there are no write-write conflicts? and write-read conflicts? Here the point is to do some research on the support that MongoDb offers for managing clusters, including the notion of write concern.
-
-
-## Changing the name of the project
-
-Go to `build.gradle` and change the name in `eclipse.project.name` as shown in the code snipped below (`...` refers to additional code that has been removed for the sake of presentation):
-
-```
-...
-eclipse {
-	project {
-		name 'week14_miniproject1_sample'
-		...
-	}
-}
-...
-```
-
-
-
-
-
-***
-&copy; Artur Boronat, 2015-20
+&copy; Dhrupal Shah, 2023-2024
