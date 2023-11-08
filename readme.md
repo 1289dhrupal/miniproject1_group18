@@ -21,6 +21,7 @@ Fill up the `application.properties` file located in the resource folder with th
 
 #### Step 3: Initialize the Dataset
 Run `SetupData.groovy` as a Groovy script to set up the initial dataset required for analysis.
+> **NOTE:** The dataset provided is pre-populated with necessary field values for demonstration purposes. It is recommended not to fetch new data during the demo as it may be time-consuming and require significant disk space.
 
 #### Step 4: Run Analysis Scripts
 Execute either `Groovy_Query.groovy` or `MongoDB_Query.groovy` as Groovy scripts to perform data analysis.
@@ -43,6 +44,22 @@ The NYC taxi data being analyzed includes the following fields:
 
 For an in-depth understanding of the dataset, refer to the [NYC Taxi Data Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_hvfhs.pdf)<br>
 The dataset can be obtained from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
+
+## Performance Optimization
+When working with extensive datasets in the NYC Taxi Data Analysis Project, it may be necessary to increase the Java Virtual Machine (JVM) heap size to improve performance and avoid out-of-memory issues.
+
+#### Increasing Heap Memory in Eclipse
+To allocate more heap memory in Eclipse:
+1. Navigate to `Run -> Run Configurations`.
+2. Within the Run Configurations window, select the specific run configuration for your Groovy script.
+3. Switch to the `Arguments` tab.
+4. In the `VM arguments` section, enter the following options:
+```
+-Xms512m
+-Xmx2048m
+```
+Here, `-Xms512m` sets the initial heap size, and `-Xmx2048m` sets the maximum heap size. Adjust the numbers to suit your data size and system capabilities.<br>
+Make sure to apply the changes and close the Run Configurations window before executing your script.
 
 ## Acknowledgments
 New York City Taxi and Limousine Commission for providing the dataset.<br>
