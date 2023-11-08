@@ -55,7 +55,7 @@ public class MongoDBHelper {
 			llistDocBatch.add(lDoc)
 
 			// When the batch size is reached, insert the batch and clear the list
-			if (llistDocBatch.size() == 100_000 || idx + 1 == llistObj.size()) {
+			if (llistDocBatch.size() == mProperties.mongodb_batch_size || idx + 1 == llistObj.size()) {
 				getCollection(pCollectionName).insertMany(llistDocBatch)
 				llistDocBatch = []
 			}
